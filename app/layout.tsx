@@ -5,6 +5,8 @@ import { CurrencyProvider } from "@/lib/currency";
 import RouteProgress from "@/components/RouteProgress";
 import AnnouncementBar from "@/components/AnnouncementBar";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "GenzTopup — Fast & Secure Game Top Up",
   description:
