@@ -4,6 +4,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+import { OrderStatus } from "@prisma/client";
+
 const lookupSchema = z.object({
   query: z.string().min(3).max(100),
 });
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // Only surface orders where payment has actually gone through.
     // Hide PENDING / CANCELLED / FAILED / REFUNDED from public search.
-    const PAID_STATUSES = ["PAID", "PROCESSING", "DELIVERED"];
+    const PAID_STATUSES: OrderStatus[] = ["PAID", "PROCESSING", "DELIVERED"];
 
     const orders = await prisma.order.findMany({
       where: {
