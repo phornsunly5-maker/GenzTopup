@@ -12,6 +12,7 @@ module.exports = {
         mono: ['"JetBrains Mono"', "monospace"],
       },
       colors: {
+        // ពណ៌ថ្មីសម្រាប់ GenzTopup
         brand: {
           bg: "#09090B",
           surface: "#121217",
@@ -23,12 +24,23 @@ module.exports = {
           text: "#FAFAFA",
           muted: "#A1A1AA",
         },
+        // ល្បិច៖ ដាក់ពណ៌ fox ឱ្យដូចគ្នាទៅនឹង brand ដើម្បីកុំឱ្យ File Admin ចាស់ៗ Error
+        fox: {
+          bg: "#09090B",
+          surface: "#121217",
+          card: "#18181F",
+          border: "#27272A",
+          primary: "#8B5CF6", 
+          accent: "#06B6D4",  
+          gold: "#FBBF24",
+          text: "#FAFAFA",
+          muted: "#A1A1AA",
+        },
       },
       boxShadow: {
         "glow-sm": "0 0 12px rgba(139, 92, 246, 0.35)",
         "glow": "0 0 30px rgba(139, 92, 246, 0.45)",
         "glow-lg": "0 0 60px rgba(139, 92, 246, 0.55)",
-        "glow-cyan": "0 0 30px rgba(6, 182, 212, 0.45)",
         "inner-glow": "inset 0 0 24px rgba(139, 92, 246, 0.25)",
       },
       backgroundImage: {
