@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -45,7 +45,8 @@ const STATUS_META: Record<string, { label: string; color: string; desc: string }
   CANCELLED: { label: "Cancelled", color: "text-brand-muted border-brand-border bg-brand-card", desc: "Order was cancelled" },
 };
 
-export default function OrderPage() {
+// ១. បង្កើត Function ថ្មីសម្រាប់ខ្លឹមសារ
+function OrderPageContent() {
   const searchParams = useSearchParams();
   const [orderNumber, setOrderNumber] = useState("");
   const [order, setOrder] = useState<OrderInfo | null>(null);
@@ -240,5 +241,14 @@ export default function OrderPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+// ២. បន្ថែម Suspense នៅខាងក្រោមគេបង្អស់
+export default function OrderPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-brand-muted">Loading...</div>}>
+      <OrderPageContent />
+    </Suspense>
   );
 }
