@@ -9,7 +9,7 @@ interface GameCardProps {
   featured?: boolean;
 }
 
-export default function GameCard({ slug, name, publisher, currencyName, imageUrl, featured }: GameCardProps) {
+export default function ItemCard({ slug, name, publisher, currencyName, imageUrl, featured }: GameCardProps) {
   return (
     <Link
       href={`/games/${slug}`}
