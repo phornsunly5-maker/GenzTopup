@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import GameCard from "@/components/GameCard";
+import ItemCard from "@/components/ItemCard";
 import RecentOrdersTicker from "@/components/RecentOrdersTicker";
 import HeroCarousel from "@/components/HeroCarousel";
 import Link from "next/link";
