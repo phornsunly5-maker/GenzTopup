@@ -1,0 +1,226 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. CONFIGURATION & AUTHENTICATION
+// ==========================================
+
+model Settings {
+  id                  Int      @id @default(1)
+  siteName            String   @default("GenzTopup")
+  exchangeRate        Float    @default(4100)
+  supportTelegram     String?  @default("@genztopup")
+  supportEmail        String?  @default("support@genztopup.com")
+  
+  announcement        String?
+  announcementTone    String?  @default("info") // info, warning, promo
+  maintenanceMode     Boolean  @default(false)
+  maintenanceMessage  String?
+  
+  telegramBotToken    String?
+  telegramChatId      String?
+  
+  updatedAt           DateTime @updatedAt
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("SUPERADMIN")
+  active       Boolean  @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ==========================================
+// 2. E-COMMERCE CORE (Games, Products, Orders)
+// ==========================================
+
+model Game {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  name           String
+  publisher      String
+  description    String?
+  imageUrl       String
+  bannerUrl      String?
+  currencyName   String    // e.g. "Diamonds", "UC"
+  uidLabel       String    @default("Player ID")
+  uidExample     String?
+  requiresServer Boolean   @default(false)
+  servers        String    @default("[]") // JSON string array
+  featured       Boolean   @default(false)
+  active         Boolean   @default(true)
+  sortOrder      Int       @default(0)
+  
+  products       Product[]
+  orders         Order[]
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  
+  name      String   // e.g. "86 Diamonds"
+  amount    Float    @default(0)
+  bonus     Float    @default(0)
+  priceUsd  Float
+  badge     String?  // e.g. "Hot", "Best Value", "Pass"
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  
+  orders    Order[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id             String   @id @default(cuid())
+  orderNumber    String   @unique // e.g. GZ-XXXXXX
+  
+  // Relations
+  gameId         String
+  game           Game     @relation(fields: [gameId], references: [id])
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id])
+  
+  // Customer Info
+  customerEmail  String?
+  customerPhone  String?
+  ipAddress      String?
+  
+  // Delivery Info
+  playerUid      String
+  playerNickname String?
+  serverId       String?
+  
+  // Payment Info
+  status         OrderStatus @default(PENDING)
+  paymentMethod  String      @default("KHPAY")
+  paymentRef     String?
+  amountUsd      Float
+  amountKhr      Int?
+  promoCode      String?
+  
+  // Fulfillment
+  deliveryNote   String?
+  failureReason  String?
+  
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  paidAt         DateTime?
+  deliveredAt    DateTime?
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  DELIVERED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+// ==========================================
+// 3. MARKETING & CONTENT
+// ==========================================
+
+model PromoCode {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  discountType  String    // "PERCENT" or "FIXED"
+  discountValue Float
+  minOrderUsd   Float     @default(0)
+  maxUses       Int       @default(0) // 0 = unlimited
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  active        Boolean   @default(true)
+  
+  createdAt     DateTime  @default(now())
+}
+
+model HeroBanner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  imageUrl  String
+  linkUrl   String?
+  ctaLabel  String?
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String   @default("general")
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String?
+  content     String
+  coverUrl    String?
+  tag         String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ==========================================
+// 4. SECURITY & AUDIT
+// ==========================================
+
+model BlockedIdentity {
+  id        String   @id @default(cuid())
+  type      String   // email, phone, ip, uid
+  value     String
+  reason    String?
+  
+  createdAt DateTime @default(now())
+
+  @@unique([type, value]) // Prevent duplicate bans
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminEmail String?
+  action     String
+  targetType String?
+  targetId   String?
+  details    String?
+  
+  createdAt  DateTime @default(now())
+}
