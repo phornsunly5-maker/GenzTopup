@@ -92,42 +92,51 @@ model Product {
 }
 
 model Order {
-  id             String   @id @default(cuid())
-  orderNumber    String   @unique // e.g. GZ-XXXXXX
+  id                 String      @id @default(cuid())
+  orderNumber        String      @unique // e.g. GZ-XXXXXX
   
   // Relations
-  gameId         String
-  game           Game     @relation(fields: [gameId], references: [id])
-  productId      String
-  product        Product  @relation(fields: [productId], references: [id])
+  gameId             String
+  game               Game        @relation(fields: [gameId], references: [id])
+  productId          String
+  product            Product     @relation(fields: [productId], references: [id])
   
   // Customer Info
-  customerEmail  String?
-  customerPhone  String?
-  ipAddress      String?
+  customerEmail      String?
+  customerPhone      String?
+  ipAddress          String?
+  userAgent          String?     // បន្ថែមថ្មី
   
   // Delivery Info
-  playerUid      String
-  playerNickname String?
-  serverId       String?
+  playerUid          String
+  playerNickname     String?
+  serverId           String?
   
   // Payment Info
-  status         OrderStatus @default(PENDING)
-  paymentMethod  String      @default("KHPAY")
-  paymentRef     String?
-  amountUsd      Float
-  amountKhr      Int?
-  promoCode      String?
+  status             OrderStatus @default(PENDING)
+  paymentMethod      String      @default("KHPAY")
+  paymentRef         String?
+  paymentUrl         String?     // បន្ថែមថ្មី
+  qrString           String?     // បន្ថែមថ្មី
+  paymentExpiresAt   DateTime?   // បន្ថែមថ្មី
+  
+  // Pricing
+  amountUsd          Float
+  amountKhr          Int?
+  
+  // Promo
+  promoCodeId        String?     // បន្ថែមថ្មី
+  discountUsd        Float       @default(0) // បន្ថែមថ្មី
   
   // Fulfillment
-  deliveryNote   String?
-  failureReason  String?
+  deliveryNote       String?
+  failureReason      String?
   
   // Timestamps
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  paidAt         DateTime?
-  deliveredAt    DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  paidAt             DateTime?
+  deliveredAt        DateTime?
 }
 
 enum OrderStatus {
