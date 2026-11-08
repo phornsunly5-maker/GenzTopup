@@ -6,16 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCurrency } from "@/lib/currency";
 import {
-  Clock,
-  CheckCircle2,
-  Copy,
-  Check,
-  Smartphone,
-  Loader2,
-  AlertCircle,
-  RefreshCw,
-  ShieldCheck,
-  ExternalLink,
+  Clock, CheckCircle2, Copy, Check, Smartphone, Loader2, AlertCircle, RefreshCw, ShieldCheck, ExternalLink,
 } from "lucide-react";
 
 interface OrderPayment {
@@ -62,9 +53,7 @@ export default function CheckoutPage() {
 
   const fetchOrder = useCallback(async () => {
     try {
-      const res = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}`, {
-        cache: "no-store",
-      });
+      const res = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}`, { cache: "no-store" });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
         throw new Error(j.error || "Order not found");
@@ -79,41 +68,21 @@ export default function CheckoutPage() {
     }
   }, [orderNumber]);
 
-  // Initial load
   useEffect(() => {
     setLoading(true);
     fetchOrder().finally(() => setLoading(false));
   }, [fetchOrder]);
 
-  // ─── Auto-redirect if order already has a KHPay payment URL ───
   useEffect(() => {
-    if (
-      order &&
-      order.status === "PENDING" &&
-      order.paymentUrl &&
-      KHPAY_URL_RE.test(order.paymentUrl) &&
-      !redirecting
-    ) {
+    if (order && order.status === "PENDING" && order.paymentUrl && KHPAY_URL_RE.test(order.paymentUrl) && !redirecting) {
       setRedirecting(true);
-      const t = setTimeout(() => {
-        window.location.href = order.paymentUrl!;
-      }, 400);
+      const t = setTimeout(() => { window.location.href = order.paymentUrl!; }, 400);
       return () => clearTimeout(t);
     }
   }, [order, redirecting]);
 
-  // ─── Client-side KHPay transaction creation ───
-  // When server-side failed (Cloudflare), create transaction from the browser
   useEffect(() => {
-    if (
-      !order ||
-      order.status !== "PENDING" ||
-      redirecting ||
-      creatingTxn ||
-      txnCreatedRef.current
-    ) return;
-
-    // Already has a KHPay URL or QR — no need to create client-side
+    if (!order || order.status !== "PENDING" || redirecting || creatingTxn || txnCreatedRef.current) return;
     if (order.paymentUrl && KHPAY_URL_RE.test(order.paymentUrl)) return;
     if (order.qrString) return;
     if (order.paymentRef?.startsWith("SIM-")) return;
@@ -129,15 +98,11 @@ export default function CheckoutPage() {
         const origin = window.location.origin;
         const res = await fetch("https://khpay.site/api/v1/qr/generate", {
           method: "POST",
-          headers: {
-            "Authorization": `Bearer ${khpayKey}`,
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
+          headers: { "Authorization": `Bearer ${khpayKey}`, "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify({
             amount: order.amountUsd.toFixed(2),
             currency: "USD",
-            note: `GenzTopup Order ${order.orderNumber}`,
+            note: `GenzTopup Order ${order.orderNumber}`, // កែទៅជា GenzTopup
             success_url: `${origin}/order?number=${order.orderNumber}`,
             cancel_url: `${origin}/games/${order.gameSlug}`,
           }),
@@ -145,95 +110,57 @@ export default function CheckoutPage() {
 
         const json = await res.json();
         if (json.success && json.data?.payment_url) {
-          // Save transaction info to our order
           await fetch(`/api/orders/${encodeURIComponent(order.orderNumber)}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              transactionId: json.data.transaction_id,
-              paymentUrl: json.data.payment_url,
-            }),
+            body: JSON.stringify({ transactionId: json.data.transaction_id, paymentUrl: json.data.payment_url }),
           });
-
-          // Redirect to KHPay hosted payment page
           setRedirecting(true);
           window.location.href = json.data.payment_url;
         } else {
-          console.error("[khpay] Client-side create failed:", json);
           setCreatingTxn(false);
         }
       } catch (err) {
-        console.error("[khpay] Client-side create error:", err);
         setCreatingTxn(false);
       }
     })();
   }, [order, redirecting, creatingTxn]);
 
-  // Polling while awaiting payment
   useEffect(() => {
     if (!order || redirecting || creatingTxn) return;
     if (TERMINAL.has(order.status) || PAID_STATES.has(order.status)) {
-      if (pollRef.current) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
       if (PAID_STATES.has(order.status)) {
-        const t = setTimeout(() => {
-          router.push(`/order?number=${order.orderNumber}`);
-        }, 2000);
+        const t = setTimeout(() => { router.push(`/order?number=${order.orderNumber}`); }, 2000);
         return () => clearTimeout(t);
       }
       return;
     }
 
-    pollRef.current = setInterval(() => {
-      fetchOrder();
-    }, 3000);
-
-    return () => {
-      if (pollRef.current) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
-    };
+    pollRef.current = setInterval(() => { fetchOrder(); }, 3000);
+    return () => { if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; } };
   }, [order, fetchOrder, router, redirecting, creatingTxn]);
 
-  // Countdown tick
   useEffect(() => {
-    if (!order?.paymentExpiresAt) {
-      setRemainingMs(null);
-      return;
-    }
+    if (!order?.paymentExpiresAt) { setRemainingMs(null); return; }
     const expiry = new Date(order.paymentExpiresAt).getTime();
-    const tick = () => {
-      const ms = expiry - Date.now();
-      setRemainingMs(ms > 0 ? ms : 0);
-    };
+    const tick = () => { const ms = expiry - Date.now(); setRemainingMs(ms > 0 ? ms : 0); };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [order?.paymentExpiresAt]);
 
   async function copy(text: string, label: string) {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(label);
-      setTimeout(() => setCopied(null), 1500);
-    } catch { /* */ }
+    try { await navigator.clipboard.writeText(text); setCopied(label); setTimeout(() => setCopied(null), 1500); } catch { /* */ }
   }
 
   async function handleSimulate() {
     if (!order || simulating) return;
     setSimulating(true);
     try {
-      await fetch(
-        `/api/payment/simulate?order=${encodeURIComponent(order.orderNumber)}&ref=${encodeURIComponent(order.paymentRef ?? "")}`,
-        { cache: "no-store" }
-      );
+      await fetch(`/api/payment/simulate?order=${encodeURIComponent(order.orderNumber)}&ref=${encodeURIComponent(order.paymentRef ?? "")}`, { cache: "no-store" });
       await fetchOrder();
-    } finally {
-      setSimulating(false);
-    }
+    } finally { setSimulating(false); }
   }
 
   const isExpired = remainingMs !== null && remainingMs <= 0 && !PAID_STATES.has(order?.status ?? "");
@@ -244,28 +171,20 @@ export default function CheckoutPage() {
     <>
       <Header />
       <main className="mx-auto max-w-3xl px-4 py-8 sm:py-12 sm:px-6">
-        {/* ── Redirecting / Creating txn ── */}
         {(redirecting || creatingTxn) && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-fox-primary/20 mb-4">
-              <ExternalLink className="h-8 w-8 text-fox-primary animate-pulse" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/20 mb-4">
+              <ExternalLink className="h-8 w-8 text-brand-primary animate-pulse" />
             </div>
-            <h1 className="font-display text-xl font-bold mb-2">
-              {redirecting ? "Redirecting to Payment..." : "Preparing Payment..."}
-            </h1>
-            <p className="text-fox-muted text-sm mb-4">
-              {redirecting
-                ? "Opening KHPay secure payment page."
-                : "Setting up your payment, please wait..."}
-            </p>
-            <Loader2 className="h-5 w-5 animate-spin text-fox-primary" />
+            <h1 className="font-display text-xl font-bold mb-2">{redirecting ? "Redirecting to Payment..." : "Preparing Payment..."}</h1>
+            <p className="text-brand-muted text-sm mb-4">{redirecting ? "Opening KHPay secure payment page." : "Setting up your payment, please wait..."}</p>
+            <Loader2 className="h-5 w-5 animate-spin text-brand-primary" />
           </div>
         )}
 
         {!redirecting && !creatingTxn && loading && (
-          <div className="flex items-center justify-center py-24 text-fox-muted">
-            <Loader2 className="h-6 w-6 animate-spin mr-2" />
-            Loading payment...
+          <div className="flex items-center justify-center py-24 text-brand-muted">
+            <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading payment...
           </div>
         )}
 
@@ -273,172 +192,92 @@ export default function CheckoutPage() {
           <div className="rounded-xl border border-red-400/40 bg-red-400/10 p-6 text-center">
             <AlertCircle className="h-8 w-8 text-red-400 mx-auto mb-2" />
             <p className="text-red-300">{error}</p>
-            <a href="/" className="inline-block mt-4 btn-primary">
-              Back to home
-            </a>
+            <a href="/" className="inline-block mt-4 btn-primary">Back to home</a>
           </div>
         )}
 
         {!redirecting && !creatingTxn && !loading && order && (
           <>
-            {/* Success state */}
             {isPaid && (
               <div className="rounded-2xl border border-green-400/40 bg-gradient-to-br from-green-500/10 to-emerald-500/5 p-8 text-center">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20 mb-4">
                   <CheckCircle2 className="h-10 w-10 text-green-400" />
                 </div>
                 <h1 className="font-display text-2xl font-bold mb-2">Payment Received!</h1>
-                <p className="text-fox-muted text-sm mb-1">
-                  Order <span className="font-mono text-fox-text">{order.orderNumber}</span>
-                </p>
-                <p className="text-fox-muted text-sm">Redirecting you to order tracker...</p>
-                <Loader2 className="h-4 w-4 animate-spin mx-auto mt-4 text-fox-muted" />
+                <p className="text-brand-muted text-sm mb-1">Order <span className="font-mono text-brand-text">{order.orderNumber}</span></p>
+                <p className="text-brand-muted text-sm">Redirecting you to order tracker...</p>
+                <Loader2 className="h-4 w-4 animate-spin mx-auto mt-4 text-brand-muted" />
               </div>
             )}
 
-            {/* Expired state */}
             {!isPaid && isExpired && (
               <div className="rounded-2xl border border-red-400/40 bg-red-400/10 p-8 text-center">
                 <AlertCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
                 <h1 className="font-display text-xl font-bold mb-2">Payment Expired</h1>
-                <p className="text-fox-muted text-sm mb-4">
-                  This QR code has expired. Please start a new order.
-                </p>
-                <a href={`/games/${order.gameSlug}`} className="btn-primary">
-                  Start new order
-                </a>
+                <p className="text-brand-muted text-sm mb-4">This QR code has expired. Please start a new order.</p>
+                <a href={`/games/${order.gameSlug}`} className="btn-primary">Start new order</a>
               </div>
             )}
 
-            {/* Active payment — fallback when client KHPay call failed */}
             {!isPaid && !isExpired && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <h1 className="font-display text-2xl sm:text-3xl font-bold mb-1">
-                    Complete Your Payment
-                  </h1>
-                  <p className="text-fox-muted text-sm">
-                    Use any KHQR-compatible app: ABA Pay, ACLEDA, Wing, TrueMoney, Prince Bank...
-                  </p>
+                  <h1 className="font-display text-2xl sm:text-3xl font-bold mb-1">Complete Your Payment</h1>
+                  <p className="text-brand-muted text-sm">Use any KHQR-compatible app: ABA Pay, ACLEDA, Wing, TrueMoney, Prince Bank...</p>
                 </div>
 
                 <div className="grid md:grid-cols-[auto_1fr] gap-6 items-start">
-                  {/* QR / redirect panel */}
-                  <div className="mx-auto rounded-2xl border-2 border-fox-primary/30 bg-white p-4 shadow-xl shadow-fox-primary/20">
+                  <div className="mx-auto rounded-2xl border-2 border-brand-primary/30 bg-white p-4 shadow-xl shadow-brand-primary/20">
                     {order.qrString ? (
-                      <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&ecc=M&margin=2&data=${encodeURIComponent(order.qrString)}`}
-                        alt="KHQR code"
-                        width={280}
-                        height={280}
-                        className="block"
-                      />
+                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&ecc=M&margin=2&data=${encodeURIComponent(order.qrString)}`} alt="KHQR code" width={280} height={280} className="block" />
                     ) : (
                       <div className="flex h-[280px] w-[280px] flex-col items-center justify-center text-center text-gray-500">
                         {isSimMode ? (
-                          <>
-                            <Smartphone className="h-14 w-14 mb-3 text-gray-400" />
-                            <p className="text-sm font-semibold text-gray-700">Simulation Mode</p>
-                            <p className="text-xs px-4 mt-1">Click the button below to simulate payment.</p>
-                          </>
+                          <><Smartphone className="h-14 w-14 mb-3 text-gray-400" /><p className="text-sm font-semibold text-gray-700">Simulation Mode</p><p className="text-xs px-4 mt-1">Click the button below to simulate payment.</p></>
                         ) : (
-                          <>
-                            <AlertCircle className="h-14 w-14 mb-3 text-yellow-500" />
-                            <p className="text-sm font-semibold text-gray-700">
-                              Could not connect to payment provider
-                            </p>
-                            <p className="text-xs px-4 mt-2 text-gray-500">
-                              Please try creating a new order. If this persists, contact support.
-                            </p>
-                            <a
-                              href={`/games/${order.gameSlug}`}
-                              className="mt-3 rounded-lg bg-fox-primary px-4 py-2 text-xs font-bold text-black"
-                            >
-                              Try Again
-                            </a>
-                          </>
+                          <><AlertCircle className="h-14 w-14 mb-3 text-yellow-500" /><p className="text-sm font-semibold text-gray-700">Could not connect to payment provider</p><p className="text-xs px-4 mt-2 text-gray-500">Please try creating a new order. If this persists, contact support.</p><a href={`/games/${order.gameSlug}`} className="mt-3 rounded-lg bg-brand-primary px-4 py-2 text-xs font-bold text-white">Try Again</a></>
                         )}
                       </div>
                     )}
                     <div className="mt-3 text-center">
-                      <div className="flex items-center justify-center gap-1 text-xs font-bold text-gray-900">
-                        <ShieldCheck className="h-3.5 w-3.5 text-green-600" />
-                        KHQR
-                      </div>
+                      <div className="flex items-center justify-center gap-1 text-xs font-bold text-gray-900"><ShieldCheck className="h-3.5 w-3.5 text-green-600" />KHQR</div>
                     </div>
                   </div>
 
-                  {/* Details panel */}
                   <div className="space-y-4">
-                    <div className="rounded-xl border border-fox-border bg-fox-card p-4">
-                      <div className="text-[10px] uppercase tracking-widest text-fox-muted mb-1">Amount due</div>
-                      <div className="font-display text-3xl font-bold text-fox-primary">
-                        {format(order.amountUsd)}
-                      </div>
-                      {order.amountKhr && (
-                        <div className="text-sm text-fox-muted mt-0.5">
-                          \u2248 {order.amountKhr.toLocaleString()} \u17DB
-                        </div>
-                      )}
+                    <div className="rounded-xl border border-brand-border bg-brand-card p-4">
+                      <div className="text-[10px] uppercase tracking-widest text-brand-muted mb-1">Amount due</div>
+                      <div className="font-display text-3xl font-bold text-brand-primary">{format(order.amountUsd)}</div>
+                      {order.amountKhr && <div className="text-sm text-brand-muted mt-0.5">≈ {order.amountKhr.toLocaleString()} ៛</div>}
                     </div>
 
                     {remainingMs !== null && (
                       <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/5 p-4">
-                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-yellow-400/90 mb-1">
-                          <Clock className="h-3 w-3" />
-                          Time remaining
-                        </div>
-                        <div className="font-mono text-2xl font-bold text-yellow-300">
-                          {formatCountdown(remainingMs)}
-                        </div>
+                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-yellow-400/90 mb-1"><Clock className="h-3 w-3" />Time remaining</div>
+                        <div className="font-mono text-2xl font-bold text-yellow-300">{formatCountdown(remainingMs)}</div>
                       </div>
                     )}
 
-                    <div className="rounded-xl border border-fox-border bg-fox-card p-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Loader2 className="h-4 w-4 animate-spin text-fox-primary" />
-                        <span className="text-fox-muted">Waiting for payment...</span>
-                      </div>
-                      <button
-                        onClick={fetchOrder}
-                        className="mt-2 text-xs text-fox-primary hover:underline inline-flex items-center gap-1"
-                        type="button"
-                      >
-                        <RefreshCw className="h-3 w-3" />
-                        Check now
-                      </button>
+                    <div className="rounded-xl border border-brand-border bg-brand-card p-4">
+                      <div className="flex items-center gap-2 text-sm"><Loader2 className="h-4 w-4 animate-spin text-brand-primary" /><span className="text-brand-muted">Waiting for payment...</span></div>
+                      <button onClick={fetchOrder} className="mt-2 text-xs text-brand-primary hover:underline inline-flex items-center gap-1" type="button"><RefreshCw className="h-3 w-3" />Check now</button>
                     </div>
 
                     {isSimMode && (
-                      <button
-                        type="button"
-                        onClick={handleSimulate}
-                        disabled={simulating}
-                        className="w-full rounded-xl border border-fox-accent/40 bg-fox-accent/10 text-fox-accent hover:bg-fox-accent/20 disabled:opacity-60 px-4 py-3 text-sm font-semibold transition"
-                      >
-                        {simulating ? "Processing..." : "\u25B6 Simulate Payment (dev mode)"}
+                      <button type="button" onClick={handleSimulate} disabled={simulating} className="w-full rounded-xl border border-brand-accent/40 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/20 disabled:opacity-60 px-4 py-3 text-sm font-semibold transition">
+                        {simulating ? "Processing..." : "▶ Simulate Payment (dev mode)"}
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* Order summary */}
-                <div className="rounded-xl border border-fox-border bg-fox-card p-4">
-                  <div className="text-[10px] uppercase tracking-widest text-fox-muted mb-3">Order details</div>
+                <div className="rounded-xl border border-brand-border bg-brand-card p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-brand-muted mb-3">Order details</div>
                   <div className="space-y-2 text-sm">
-                    <Row label="Order #">
-                      <button type="button" onClick={() => copy(order.orderNumber, "order")}
-                        className="inline-flex items-center gap-1.5 font-mono hover:text-fox-primary">
-                        {order.orderNumber}
-                        {copied === "order" ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3 text-fox-muted" />}
-                      </button>
-                    </Row>
+                    <Row label="Order #"><button type="button" onClick={() => copy(order.orderNumber, "order")} className="inline-flex items-center gap-1.5 font-mono hover:text-brand-primary">{order.orderNumber}{copied === "order" ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3 text-brand-muted" />}</button></Row>
                     <Row label="Game">{order.gameName}</Row>
                     <Row label="Package">{order.productName}</Row>
-                    <Row label="Player UID">
-                      <span className="font-mono">{order.playerUid}</span>
-                      {order.serverId && <span className="text-fox-muted"> ({order.serverId})</span>}
-                    </Row>
+                    <Row label="Player UID"><span className="font-mono">{order.playerUid}</span>{order.serverId && <span className="text-brand-muted"> ({order.serverId})</span>}</Row>
                   </div>
                 </div>
               </div>
@@ -452,12 +291,7 @@ export default function CheckoutPage() {
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex justify-between items-center gap-4">
-      <span className="text-fox-muted text-xs">{label}</span>
-      <span className="text-right">{children}</span>
-    </div>
-  );
+  return (<div className="flex justify-between items-center gap-4"><span className="text-brand-muted text-xs">{label}</span><span className="text-right">{children}</span></div>);
 }
 
 function formatCountdown(ms: number): string {
