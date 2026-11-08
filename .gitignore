@@ -1,0 +1,6 @@
+/app/api/auth/**
+!/app/api/auth/*
+
+/app/api/auth/**
+/app/api/auth/**
+/app/api/banlist/**
