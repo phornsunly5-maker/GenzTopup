@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import GameCard from "@/components/GameCard";
+import ItemCard from "@/components/ItemCard";
 import RecentOrdersTicker from "@/components/RecentOrdersTicker";
 import HeroCarousel from "@/components/HeroCarousel";
 import Link from "next/link";
@@ -80,7 +80,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {games.map((game, i) => (
             <div key={game.id} className="fade-up" style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}>
-              <GameCard
+              <ItemCard
                 slug={game.slug}
                 name={game.name}
                 publisher={game.publisher}
