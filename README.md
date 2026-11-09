@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/-RITHTOPUP-f97316?style=for-the-badge&labelColor=0f172a&logoColor=white" alt="RITHTOPUP" />
+<img src="https://img.shields.io/badge/-ZENNLYYSTORE-f97316?style=for-the-badge&labelColor=0f172a&logoColor=white" alt="ZENNLYYSTORR" />
 
 ### ⚡ Instant game top-up storefront for Cambodia
 
@@ -20,7 +20,7 @@ A production-ready **Next.js 14** platform for selling in-game credits — with 
 
 ## 🎯 What is this?
 
-**RITHTOPUP** lets customers buy Diamonds / UC / Genesis Crystals / game passes using a single KHQR code scannable by **every major Cambodian bank app** — ABA Pay, ACLEDA Pay, Wing, TrueMoney, Chip Mong, Prince Bank, and more.
+**ZENNLYSTORR** lets customers buy Diamonds / UC / Genesis Crystals / game passes using a single KHQR code scannable by **every major Cambodian bank app** — ABA Pay, ACLEDA Pay, Wing, TrueMoney, Chip Mong, Prince Bank, and more.
 
 | Customer side | Admin side |
 |---|---|

@@ -12,80 +12,51 @@ module.exports = {
         mono: ['"JetBrains Mono"', "monospace"],
       },
       colors: {
-        // ពណ៌ថ្មីសម្រាប់ GenzTopup
         brand: {
-          bg: "#09090B",
-          surface: "#121217",
-          card: "#18181F",
+          bg: "#050508", // ងងឹតជាងមុនបន្តិច ដើម្បីឱ្យ Neon លេចធ្លោ
+          surface: "#0F0F15",
+          card: "#15151E",
           border: "#27272A",
-          primary: "#8B5CF6", // Purple
-          accent: "#06B6D4",  // Cyan
+          primary: "#A855F7", // Purple Neon
+          accent: "#06B6D4",  // Cyan Neon
           gold: "#FBBF24",
           text: "#FAFAFA",
           muted: "#A1A1AA",
         },
-        // ល្បិច៖ ដាក់ពណ៌ fox ឱ្យដូចគ្នាទៅនឹង brand ដើម្បីកុំឱ្យ File Admin ចាស់ៗ Error
-        fox: {
-          bg: "#09090B",
-          surface: "#121217",
-          card: "#18181F",
-          border: "#27272A",
-          primary: "#8B5CF6", 
-          accent: "#06B6D4",  
-          gold: "#FBBF24",
-          text: "#FAFAFA",
-          muted: "#A1A1AA",
+        fox: { // រក្សាទុកសម្រាប់ Admin ចាស់ៗ
+          bg: "#050508", surface: "#0F0F15", card: "#15151E", border: "#27272A",
+          primary: "#A855F7", accent: "#06B6D4", gold: "#FBBF24", text: "#FAFAFA", muted: "#A1A1AA",
         },
       },
       boxShadow: {
-        "glow-sm": "0 0 12px rgba(139, 92, 246, 0.35)",
-        "glow": "0 0 30px rgba(139, 92, 246, 0.45)",
-        "glow-lg": "0 0 60px rgba(139, 92, 246, 0.55)",
-        "inner-glow": "inset 0 0 24px rgba(139, 92, 246, 0.25)",
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "aurora":
-          "radial-gradient(60% 60% at 20% 20%, rgba(139,92,246,0.25) 0%, transparent 60%), radial-gradient(55% 55% at 80% 30%, rgba(6,182,212,0.20) 0%, transparent 60%), radial-gradient(50% 50% at 50% 90%, rgba(251,191,36,0.10) 0%, transparent 60%)",
+        "glow-primary": "0 0 20px rgba(168, 85, 247, 0.4)",
+        "glow-accent": "0 0 20px rgba(6, 182, 212, 0.4)",
+        "glass": "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
       },
       animation: {
-        glow: "glow 2s ease-in-out infinite alternate",
-        float: "float 6s ease-in-out infinite",
-        "float-slow": "float 9s ease-in-out infinite",
-        shine: "shine 3s linear infinite",
-        aurora: "aurora 18s ease-in-out infinite",
-        "gradient-x": "gradient-x 8s ease infinite",
-        marquee: "marquee 30s linear infinite",
-        "fade-up": "fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
-        "fade-in": "fade-in 0.6s ease-out both",
-        "scale-in": "scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both",
+        "aurora": "aurora 15s ease-in-out infinite alternate",
+        "float": "float 6s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        "shimmer": "shimmer 2s linear infinite",
       },
       keyframes: {
-        glow: {
-          "0%": { boxShadow: "0 0 20px rgba(139, 92, 246, 0.3)" },
-          "100%": { boxShadow: "0 0 40px rgba(6, 182, 212, 0.5)" },
+        aurora: {
+          "0%": { transform: "scale(1) translate(0, 0)", opacity: "0.6" },
+          "50%": { transform: "scale(1.2) translate(5%, 5%)", opacity: "0.8" },
+          "100%": { transform: "scale(1) translate(-5%, -5%)", opacity: "0.6" },
         },
         float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-12px)" },
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-15px)" },
         },
-        shine: {
-          "0%": { backgroundPosition: "-200% center" },
-          "100%": { backgroundPosition: "200% center" },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "1", filter: "brightness(1)" },
+          "50%": { opacity: "0.8", filter: "brightness(1.5)" },
         },
-        aurora: {
-          "0%, 100%": { transform: "translate3d(0,0,0) rotate(0deg)", opacity: "0.85" },
-          "50%": { transform: "translate3d(3%, -4%, 0) rotate(8deg)", opacity: "1" },
-        },
-        "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "scale-in": {
-          "0%": { opacity: "0", transform: "scale(0.92)" },
-          "100%": { opacity: "1", transform: "scale(1)" },
-        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        }
       },
     },
   },

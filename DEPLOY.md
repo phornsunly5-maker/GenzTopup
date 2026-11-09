@@ -1,9 +1,9 @@
-# RITHTOPUP — Deploy to Vercel + Neon (Free, ~10 min)
+# ZENNLYYSTORR — Deploy to Vercel + Neon (Free, ~10 min)
 
 ## Step 1 — Create Neon database (2 min)
 
 1. Go to https://neon.tech → **Sign up** (GitHub login fastest)
-2. Create Project → name it `rithtopup` → pick region **Singapore** (closest to KH)
+2. Create Project → name it `ZennLyyStore` → pick region **Singapore** (closest to KH)
 3. Copy the **connection string** — looks like:
    ```
    postgresql://neondb_owner:xxxxx@ep-xxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
