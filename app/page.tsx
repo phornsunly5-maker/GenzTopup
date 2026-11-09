@@ -1,68 +1,59 @@
 import { prisma } from "@/lib/prisma";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ItemCard from "@/components/ItemCard";
+import GameCard from "@/components/GameCard";
 import RecentOrdersTicker from "@/components/RecentOrdersTicker";
 import HeroCarousel from "@/components/HeroCarousel";
 import Link from "next/link";
-import { Zap, ShieldCheck, BadgePercent, Gamepad2, UserRoundCheck, CreditCard, ArrowRight, Search, Sparkles } from "lucide-react";
+import { Zap, ShieldCheck, Gamepad2, ArrowRight, Search, Sparkles, TrendingUp, CreditCard, UserRoundCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [games, banners] = await Promise.all([
-    prisma.game.findMany({
-      where: { active: true },
-      orderBy: [{ featured: "desc" }, { sortOrder: "asc" }],
-    }),
-    prisma.heroBanner.findMany({
-      where: { active: true },
-      orderBy: { sortOrder: "asc" },
-    }),
+    prisma.game.findMany({ where: { active: true }, orderBy: [{ featured: "desc" }, { sortOrder: "asc" }] }),
+    prisma.heroBanner.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
   ]);
 
   return (
-    <>
+    <div className="bg-anime-4d min-h-screen flex flex-col relative overflow-hidden">
+      <div className="bg-grid-4d" />
       <Header />
 
       {banners.length > 0 && (
-        <div className="pt-6">
+        <div className="pt-8 relative z-10">
           <HeroCarousel banners={banners} />
         </div>
       )}
 
-      {/* Hero */}
-      <section className="relative overflow-hidden py-16 sm:py-24">
-        <div className="pointer-events-none absolute top-0 left-1/4 h-[500px] w-[500px] rounded-full bg-brand-primary/15 blur-[120px] animate-float" />
-        <div className="pointer-events-none absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-brand-accent/10 blur-[120px] animate-float-slow" />
+      {/* 4D Hero Section */}
+      <section className="relative py-24 sm:py-32 flex flex-col items-center justify-center text-center z-10">
+        {/* Floating Neon Orbs */}
+        <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-brand-primary/20 blur-[100px] animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-brand-accent/20 blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
 
-        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-brand-primary/30 bg-brand-primary/10 px-4 py-1.5 text-xs font-medium text-brand-primary mb-6 fade-up backdrop-blur-sm shadow-[0_0_20px_rgba(139,92,246,0.2)]">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-primary opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-primary" />
-            </span>
-            24/7 Instant Delivery
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand-primary/30 bg-brand-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-primary mb-8 backdrop-blur-md">
+            <Sparkles className="h-4 w-4" /> The #1 Top-Up Experience
           </div>
 
-          <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight fade-up" style={{ animationDelay: "0.1s" }}>
-            Game Top-Ups, <span className="shine-text">Instant.</span>
+          <h1 className="font-display text-5xl sm:text-7xl font-extrabold tracking-tight mb-6 text-white drop-shadow-2xl">
+            Level Up <br className="sm:hidden" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-purple-400 to-brand-accent">
+              Instantly.
+            </span>
           </h1>
 
-          <p className="mt-5 text-base sm:text-lg text-brand-muted max-w-xl mx-auto fade-up leading-relaxed" style={{ animationDelay: "0.2s" }}>
-            Mobile Legends, Free Fire, PUBG, Genshin Impact &amp; more.
-            Enter your UID, pay, done.
+          <p className="mt-4 text-lg sm:text-xl text-brand-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+            Top up your favorite games securely with KHQR. Delivered in seconds. No login required.
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 fade-up" style={{ animationDelay: "0.3s" }}>
-            <Link href="#games" className="btn-primary group text-base py-3.5 px-8 w-full sm:w-auto">
-              <Sparkles className="h-5 w-5" />
-              Top Up Now
-              <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="#games" className="btn-primary w-full sm:w-auto text-lg px-8 py-4 group">
+              <Gamepad2 className="h-5 w-5" /> Explore Games <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/order" className="btn-ghost py-3.5 px-8 w-full sm:w-auto">
-              <Search className="h-4 w-4" />
-              Track Order
+            <Link href="/order" className="btn-ghost w-full sm:w-auto text-lg px-8 py-4">
+              <Search className="h-5 w-5" /> Track Order
             </Link>
           </div>
         </div>
@@ -70,23 +61,23 @@ export default async function HomePage() {
 
       <RecentOrdersTicker />
 
-      {/* Games grid */}
-      <section id="games" className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3">Choose Your Game</h2>
-          <p className="text-brand-muted text-sm">Tap a game to top up instantly</p>
+      {/* Games Grid */}
+      <section id="games" className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="flex items-end justify-between mb-12">
+          <div>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 flex items-center gap-3">
+              <TrendingUp className="h-8 w-8 text-brand-accent" /> Trending Games
+            </h2>
+            <p className="text-brand-muted">Select a game to top up instantly.</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {games.map((game, i) => (
-            <div key={game.id} className="fade-up" style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}>
-              <ItemCard
-                slug={game.slug}
-                name={game.name}
-                publisher={game.publisher}
-                currencyName={game.currencyName}
-                imageUrl={game.imageUrl}
-                featured={game.featured}
+            <div key={game.id} className="fade-up" style={{ animationDelay: `${Math.min(i, 8) * 50}ms` }}>
+              <GameCard
+                slug={game.slug} name={game.name} publisher={game.publisher}
+                currencyName={game.currencyName} imageUrl={game.imageUrl} featured={game.featured}
               />
             </div>
           ))}
@@ -94,24 +85,24 @@ export default async function HomePage() {
       </section>
 
       {/* How it works */}
-      <section className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+      <section className="relative z-10 mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8 border-t border-white/5">
+        <div className="text-center mb-16">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3">How It Works</h2>
-          <p className="text-brand-muted text-sm">Three steps. Under a minute.</p>
+          <p className="text-brand-muted text-lg">Three steps. Under a minute.</p>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-3 gap-8">
           {[
-            { step: "01", Icon: Gamepad2, title: "Pick a Game", desc: "Choose from our catalog of popular games." },
-            { step: "02", Icon: UserRoundCheck, title: "Enter UID", desc: "Just your player ID — no password needed." },
+            { step: "01", Icon: Gamepad2, title: "Pick a Game", desc: "Choose from our curated list of popular games." },
+            { step: "02", Icon: UserRoundCheck, title: "Enter UID", desc: "Just your player ID -- no password needed." },
             { step: "03", Icon: CreditCard, title: "Pay & Receive", desc: "Pay with KHQR. Credits arrive instantly." },
           ].map((s, i) => (
-            <div key={s.step} className="group relative rounded-2xl border border-brand-border/60 bg-brand-card/60 p-8 text-center transition-all duration-500 hover:border-brand-primary/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-primary/10 fade-up" style={{ animationDelay: `${i * 100}ms` }}>
-              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primary/10 border border-brand-primary/20 text-brand-primary mb-5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-[0_0_15px_rgba(139,92,246,0.2)]">
-                <s.Icon className="h-7 w-7" />
+            <div key={s.step} className="glass-card p-8 text-center group hover:border-brand-primary/50 transition-all duration-300">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary mb-6 shadow-[0_0_20px_rgba(168,85,247,0.2)] group-hover:scale-110 transition-transform">
+                <s.Icon className="h-8 w-8" />
               </div>
-              <div className="text-[10px] font-bold text-brand-primary tracking-widest mb-2">STEP {s.step}</div>
-              <h3 className="font-display text-lg font-bold mb-2">{s.title}</h3>
+              <div className="text-xs font-bold text-brand-accent tracking-widest mb-2">STEP {s.step}</div>
+              <h3 className="font-display text-xl font-bold mb-3 text-white">{s.title}</h3>
               <p className="text-sm text-brand-muted leading-relaxed">{s.desc}</p>
             </div>
           ))}
@@ -119,6 +110,6 @@ export default async function HomePage() {
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 }

@@ -1,59 +1,45 @@
 import Link from "next/link";
+import { Zap, Send, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-brand-border/40 bg-brand-surface/40">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-primary to-brand-accent">
-                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-white">
-                  <path d="M12 2L3 7v6c0 5 3.5 9 9 10 5.5-1 9-5 9-10V7l-9-5z" stroke="currentColor" strokeWidth="2" />
-                </svg>
+    <footer className="relative border-t border-white/5 bg-[#050508] pt-16 pb-8 overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-32 bg-brand-primary/5 blur-[100px] pointer-events-none" />
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+          {/* Brand */}
+          <div className="col-span-1 lg:col-span-1">
+            <Link href="/" className="flex items-center gap-2 mb-4 group">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary to-brand-accent">
+                <Zap className="h-4 w-4 text-white" fill="currentColor" />
               </div>
-              <span className="font-display text-lg font-bold">
-                GENZ<span className="text-brand-primary">TOPUP</span>
+              <span className="font-display text-xl font-bold tracking-tight text-white">
+                ZENNLYY<span className="text-brand-primary">STORE</span>
               </span>
-            </div>
-            <p className="text-xs text-brand-muted leading-relaxed">
-              Cambodia&apos;s fastest game top-up. Instant delivery, secure payment.
+            </Link>
+            <p className="text-sm text-brand-muted leading-relaxed mb-6">
+              Cambodia&apos;s most advanced game top-up platform. Instant delivery, premium service, and 100% secure payments.
             </p>
+            <div className="flex items-center gap-2 text-xs font-bold text-green-400">
+              <ShieldCheck className="h-4 w-4" /> 100% Secure & Trusted
+            </div>
           </div>
 
+          {/* Links */}
           {[
-            {
-              heading: "Quick Links",
-              items: [
-                { label: "Home", href: "/" },
-                { label: "All Games", href: "/#games" },
-                { label: "Track Order", href: "/order" },
-                { label: "FAQ", href: "/faq" },
-                { label: "Blog", href: "/blog" },
-              ],
-            },
-            {
-              heading: "Payment",
-              items: [
-                { label: "KHQR", href: "#" },
-                { label: "ABA Pay", href: "#" },
-                { label: "Wing", href: "#" },
-              ],
-            },
-            {
-              heading: "Support",
-              items: [
-                { label: "Telegram: @genztopup", href: "#" },
-                { label: "24/7 Service", href: "#" },
-              ],
-            },
+            { heading: "Platform", items: [{ label: "Home", href: "/" }, { label: "All Games", href: "/#games" }, { label: "Track Order", href: "/order" }] },
+            { heading: "Support", items: [{ label: "FAQ", href: "/faq" }, { label: "Blog", href: "/blog" }, { label: "Contact Us", href: "#" }] },
+            { heading: "Legal", items: [{ label: "Terms of Service", href: "#" }, { label: "Privacy Policy", href: "#" }, { label: "Refund Policy", href: "#" }] },
           ].map((col) => (
             <div key={col.heading}>
-              <h4 className="font-semibold mb-3 text-xs uppercase tracking-wider text-brand-muted">{col.heading}</h4>
-              <ul className="space-y-1.5 text-sm">
+              <h4 className="font-display font-bold mb-4 text-sm uppercase tracking-wider text-white">{col.heading}</h4>
+              <ul className="space-y-3">
                 {col.items.map((it) => (
                   <li key={it.label}>
-                    <Link href={it.href} className="text-brand-text/70 transition-colors hover:text-brand-primary text-xs">
+                    <Link href={it.href} className="text-sm text-brand-muted transition-colors hover:text-brand-accent flex items-center gap-2 group">
+                      <span className="w-0 h-0.5 bg-brand-accent group-hover:w-3 transition-all duration-300 rounded-full" />
                       {it.label}
                     </Link>
                   </li>
@@ -63,9 +49,12 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-8 pt-6 border-t border-brand-border/40 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-brand-muted">
-          <p>&copy; {new Date().getFullYear()} GenzTopup. All rights reserved.</p>
-          <p>Not affiliated with Moonton, Garena, Tencent or HoYoverse.</p>
+        {/* Bottom */}
+        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-brand-muted/70">
+          <p>&copy; {new Date().getFullYear()} ZennLyyStore. All rights reserved.</p>
+          <p className="flex items-center gap-1">
+            Designed for the next generation of gamers <Send className="h-3 w-3 text-brand-primary" />
+          </p>
         </div>
       </div>
     </footer>

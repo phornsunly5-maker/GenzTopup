@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, ShieldBan } from "lucide-react";
+import { Plus, Trash2, ShieldBan, ShieldAlert } from "lucide-react";
 
 interface Blocked {
   id: string;
@@ -50,55 +50,63 @@ export default function BanlistPage() {
   }
 
   return (
-    <div className="p-4 sm:p-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold">Banlist</h1>
-          <p className="text-fox-muted text-sm">Blocked emails, phones, IPs and UIDs from placing orders.</p>
-        </div>
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-bold mb-2 flex items-center gap-3">
+          <ShieldBan className="h-8 w-8 text-red-500" /> Security Banlist
+        </h1>
+        <p className="text-brand-muted text-sm">Block malicious emails, phones, IPs, and UIDs from placing orders.</p>
       </div>
 
-      <div className="card p-5 mb-6">
-        <h2 className="font-semibold mb-4 inline-flex items-center gap-2"><ShieldBan className="h-4 w-4 text-red-400" /> Add entry</h2>
-        <div className="grid sm:grid-cols-4 gap-3">
-          <select className="input" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-            {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+      <div className="glass-card p-6 mb-8 border-red-500/20 bg-red-500/[0.02]">
+        <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-red-400 flex items-center gap-2">
+          <ShieldAlert className="h-4 w-4" /> Add New Restriction
+        </h2>
+        <div className="grid sm:grid-cols-4 gap-4">
+          <select className="input border-red-500/20 focus:border-red-500 focus:ring-red-500/30" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+            {TYPES.map((t) => <option key={t} value={t} className="bg-brand-surface">{t.toUpperCase()}</option>)}
           </select>
-          <input className="input sm:col-span-2" placeholder="value" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} />
-          <input className="input" placeholder="reason (optional)" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} />
+          <input className="input sm:col-span-2 border-red-500/20 focus:border-red-500 focus:ring-red-500/30" placeholder="Value (e.g. baduser@email.com)" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} />
+          <input className="input border-red-500/20 focus:border-red-500 focus:ring-red-500/30" placeholder="Reason (optional)" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} />
         </div>
-        <div className="mt-4">
-          <button onClick={add} disabled={saving || !form.value} className="btn-primary">
-            <Plus className="h-4 w-4" /> Block
+        <div className="mt-5">
+          <button onClick={add} disabled={saving || !form.value} className="rounded-xl bg-red-500/10 border border-red-500/30 px-5 py-2.5 text-sm font-bold text-red-400 hover:bg-red-500/20 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+            <Plus className="h-4 w-4" /> {saving ? "Blocking..." : "Block Entity"}
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-fox-muted text-sm">Loading...</div>
+        <div className="text-brand-muted text-sm animate-pulse">Scanning database...</div>
       ) : items.length === 0 ? (
-        <div className="card p-10 text-center text-fox-muted text-sm">No bans in place.</div>
+        <div className="glass-card p-12 text-center text-brand-muted text-sm">No bans in place. System is clean.</div>
       ) : (
-        <div className="card overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs uppercase tracking-wider text-fox-muted border-b border-fox-border">
+        <div className="glass-card overflow-x-auto">
+          <table className="table-modern">
+            <thead>
               <tr>
-                <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Value</th>
-                <th className="py-3 px-4">Reason</th>
-                <th className="py-3 px-4">Added</th>
-                <th className="py-3 px-4"></th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Reason</th>
+                <th>Date Added</th>
+                <th className="text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-fox-border/60">
+            <tbody>
               {items.map((b) => (
                 <tr key={b.id}>
-                  <td className="py-2 px-4"><span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 uppercase">{b.type}</span></td>
-                  <td className="py-2 px-4 font-mono">{b.value}</td>
-                  <td className="py-2 px-4 text-fox-muted">{b.reason || "—"}</td>
-                  <td className="py-2 px-4 text-xs text-fox-muted">{new Date(b.createdAt).toLocaleString()}</td>
-                  <td className="py-2 px-4 text-right">
-                    <button onClick={() => remove(b.id)} className="text-red-400 hover:text-red-300"><Trash2 className="h-4 w-4" /></button>
+                  <td>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 uppercase tracking-widest">
+                      {b.type}
+                    </span>
+                  </td>
+                  <td className="font-mono text-white">{b.value}</td>
+                  <td className="text-brand-muted">{b.reason || "--"}</td>
+                  <td className="text-xs text-brand-muted font-mono">{new Date(b.createdAt).toLocaleString()}</td>
+                  <td className="text-right">
+                    <button onClick={() => remove(b.id)} className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-colors">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </td>
                 </tr>
               ))}

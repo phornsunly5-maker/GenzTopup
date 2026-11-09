@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { ShieldAlert } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -9,35 +10,45 @@ export default async function AuditLogsPage() {
   });
 
   return (
-    <div className="p-4 sm:p-8">
-      <h1 className="font-display text-2xl sm:text-3xl font-bold mb-2">Audit Log</h1>
-      <p className="text-fox-muted text-sm mb-6">Every admin action in the last 200 events.</p>
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-bold mb-2 flex items-center gap-3">
+          <ShieldAlert className="h-8 w-8 text-brand-primary" /> Audit Logs
+        </h1>
+        <p className="text-brand-muted text-sm">Track every admin action in the ZennLyyStore system (last 200 events).</p>
+      </div>
 
       {logs.length === 0 ? (
-        <div className="card p-10 text-center text-fox-muted text-sm">No events yet.</div>
+        <div className="glass-card p-12 text-center text-brand-muted text-sm">No events recorded yet.</div>
       ) : (
-        <div className="card overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs uppercase tracking-wider text-fox-muted border-b border-fox-border">
+        <div className="glass-card overflow-x-auto">
+          <table className="table-modern">
+            <thead>
               <tr>
-                <th className="py-3 px-4">When</th>
-                <th className="py-3 px-4">Admin</th>
-                <th className="py-3 px-4">Action</th>
-                <th className="py-3 px-4">Target</th>
-                <th className="py-3 px-4">Details</th>
+                <th>Timestamp</th>
+                <th>Admin</th>
+                <th>Action</th>
+                <th>Target</th>
+                <th>Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-fox-border/60">
+            <tbody>
               {logs.map((l) => (
-                <tr key={l.id} className="hover:bg-fox-surface/40">
-                  <td className="py-2 px-4 text-fox-muted whitespace-nowrap">{new Date(l.createdAt).toLocaleString()}</td>
-                  <td className="py-2 px-4">{l.adminEmail || "—"}</td>
-                  <td className="py-2 px-4 font-mono text-xs text-fox-accent">{l.action}</td>
-                  <td className="py-2 px-4 text-xs">
-                    {l.targetType && <span className="text-fox-muted">{l.targetType}</span>}
-                    {l.targetId && <span className="font-mono text-fox-muted/70 ml-1">{l.targetId.slice(-8)}</span>}
+                <tr key={l.id}>
+                  <td className="text-brand-muted whitespace-nowrap text-xs font-mono">
+                    {new Date(l.createdAt).toLocaleString()}
                   </td>
-                  <td className="py-2 px-4 text-xs text-fox-muted max-w-sm truncate" title={l.details ?? undefined}>
+                  <td className="font-medium text-brand-text">{l.adminEmail || "System"}</td>
+                  <td className="font-mono text-xs">
+                    <span className="bg-brand-primary/10 text-brand-primary border border-brand-primary/20 px-2 py-0.5 rounded-md">
+                      {l.action}
+                    </span>
+                  </td>
+                  <td className="text-xs">
+                    {l.targetType && <span className="text-brand-muted">{l.targetType}</span>}
+                    {l.targetId && <span className="font-mono text-brand-muted/50 ml-1">#{l.targetId.slice(-6)}</span>}
+                  </td>
+                  <td className="text-xs text-brand-muted max-w-xs truncate" title={l.details ?? undefined}>
                     {l.details}
                   </td>
                 </tr>
