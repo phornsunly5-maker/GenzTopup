@@ -1,6 +1,3 @@
-// app/layout.tsx
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // ...
 import type { Metadata } from "next";
 import "./globals.css";
 import { prisma } from "@/lib/prisma";
@@ -8,26 +5,16 @@ import { CurrencyProvider } from "@/lib/currency";
 import RouteProgress from "@/components/RouteProgress";
 import AnnouncementBar from "@/components/AnnouncementBar";
 
+// បន្ថែមបន្ទាត់នេះ ដើម្បីកុំឱ្យ Vercel ទាញ Database ពេល Build
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "GenzTopup — Fast & Secure Game Top Up",
-  description:
-    "Top up Mobile Legends, Free Fire, PUBG, Genshin Impact and more. Instant delivery, secure KHQR payment. 24/7 service in Cambodia.",
-  keywords: [
-    "top up",
-    "mobile legends diamonds",
-    "free fire diamonds",
-    "pubg uc",
-    "genshin impact",
-    "ABA Pay",
-    "KHQR",
-    "Cambodia top up",
-    "GenzTopup",
-  ],
+  title: "ZennLyyStore -- Premium Game Top Up",
+  description: "Top up Mobile Legends, Free Fire, PUBG, Genshin Impact instantly. Secure KHQR payment. 24/7 service in Cambodia.",
+  keywords: ["top up", "mobile legends", "free fire", "pubg", "genz", "zennlyystore", "KHQR", "Cambodia"],
   openGraph: {
-    title: "GenzTopup — Fast & Secure Game Top Up",
-    description: "Instant game top-ups with KHQR · ABA Pay · Wing · ACLEDA",
+    title: "ZennLyyStore -- Premium Game Top Up",
+    description: "Instant game top-ups with KHQR · ABA Pay · Wing",
     type: "website",
   },
 };
@@ -37,14 +24,16 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // ទាញយកអត្រាប្តូរប្រាក់ពី Database (បើមានបញ្ហាវានឹងប្រើ 4100 ជំនួស)
   const settings = await prisma.settings.findUnique({ where: { id: 1 } }).catch(() => null);
   const exchangeRate = settings?.exchangeRate ?? 4100;
 
   return (
     <html lang="en">
-      {/* ដាក់ Class bg-anime-4d នៅក្នុង body */}
       <body className="bg-anime-4d antialiased selection:bg-brand-primary/30">
-        <div className="bg-grid-4d" /> {/* ស្រទាប់ Grid សម្រាប់ 4D */}
+        {/* 4D Grid Background Effect */}
+        <div className="bg-grid-4d" />
+        
         <RouteProgress />
         <CurrencyProvider exchangeRate={exchangeRate}>
           <AnnouncementBar />
