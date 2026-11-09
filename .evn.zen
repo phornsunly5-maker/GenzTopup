@@ -3,7 +3,7 @@
 # ==========================================
 
 # 1. DATABASE (Neon PostgreSQL)
-DATABASE_URL=postgresql://neondb_owner:npg_UaI82TZizqGu@ep-young-cake-azvab09b-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+DATABASE_URL=postgresql://neondb_owner:npg_rGgnPHk2u4Xi@ep-old-wind-azv5kn4n-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
 # 2. AUTHENTICATION
 JWT_SECRET="your-super-secret-key-at-least-32-characters-long"
